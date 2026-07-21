@@ -13,5 +13,5 @@ scipy>=1.10
 tqdm>=4.65
 imageio>=2.31
 # Backbone-specific extras (FoundationStereo pulls DINOv2 via torch.hub):
-timm>=0.9
+timm==1.0.26          # results produced with this; IGEV patch adapts its extractor to timm>=1.0
 einops>=0.7
