@@ -12,20 +12,14 @@
 
 Modern stereo matchers fail by **19–62×** when disparity becomes negative — yet
 stereoscopic content, from cinema 3D to VR, lives in exactly that regime. This
-repository releases:
-
-1. **ZDPShift**, a calibrated open-movie stereo dataset rendering 4,405 frames at
-   five zero-disparity-plane shifts each, with analytical *signed* ground truth.
-2. A **signed cost volume** — a parameter-free generalization of the one-sided
-   volume every cost-volume matcher relies on — that lets IGEV-Stereo and
-   FoundationStereo express negative disparity. Pretrained checkpoints load verbatim.
-3. Fine-tuning recipes and evaluation for RAFT-Stereo, IGEV-Stereo, and
-   FoundationStereo across the full signed-disparity regime.
+repository provides **fine-tuning and evaluation** for RAFT-Stereo, IGEV-Stereo,
+and FoundationStereo on the ZDPShift dataset, including a **signed cost volume**:
+a parameter-free generalization of the one-sided cost volume that lets cost-volume
+matchers express negative disparity. Pretrained checkpoints load verbatim.
 
 ## Install
 
-The three backbones and SEA-RAFT (for the in-the-wild verifier) are git
-submodules under `third_party/` — clone recursively:
+The three backbones are git submodules under `third_party/`:
 
 ```bash
 git clone --recursive <this-repo-url> zdpshift
@@ -39,15 +33,13 @@ pip install -r requirements.txt
 
 | Submodule | Path | Upstream |
 |-----------|------|----------|
-| FoundationStereo | `third_party/FoundationStereo`     | NVlabs/FoundationStereo |
-| IGEV-Stereo      | `third_party/IGEV/IGEV-Stereo`     | gangweiX/IGEV |
-| RAFT-Stereo      | `third_party/RAFT-Stereo`          | princeton-vl/RAFT-Stereo |
-| SEA-RAFT         | `third_party/SEA-RAFT`             | princeton-vl/SEA-RAFT |
+| FoundationStereo | `third_party/FoundationStereo` | NVlabs/FoundationStereo |
+| IGEV-Stereo      | `third_party/IGEV/IGEV-Stereo` | gangweiX/IGEV |
+| RAFT-Stereo      | `third_party/RAFT-Stereo`      | princeton-vl/RAFT-Stereo |
 
-Paths resolve automatically; override via `env.example` only if you relocate them.
-Each backbone's **SceneFlow init checkpoint** (for training) and FoundationStereo's
-**pretrained weights** (`third_party/FoundationStereo/pretrained_models/…`, for the
-zero-shot baseline) are downloaded from the respective upstream repos.
+Paths resolve automatically (override via `env.example` only if relocated). Each
+backbone's **SceneFlow init checkpoint** (for training) and FoundationStereo's
+**pretrained weights** (for the zero-shot baseline) come from the upstream repos.
 
 ## Weights
 
@@ -60,38 +52,38 @@ Fine-tuned ZDPShift checkpoints go in `weights/` (hosted on Hugging Face; see
 | `weights/igev_zdpshift_signed.pth` | IGEV-Stereo      | + signed cost volume | 0.92 px |
 | `weights/fs_zdpshift_signed.pth`   | FoundationStereo | + signed cost volume | **0.76 px** |
 
-## Quick start (shipped samples)
+## Dataset
 
-The repo ships a tiny sample set so you can run without the full dataset:
+Download ZDPShift and point `--dataset` / `--train-root` at the split. A tiny
+sample (one scene across all five ZDP shifts) ships under `dataset/eval/` for a
+smoke test. Layout:
+
+```
+<root>/<split>/<scene>/frame_xxxxx/shift_±N/{left.png, right.png, disparity.npy, meta.json}
+```
+
+Signed ground truth follows the rectified-pair geometry `d(Z,Δ) = fB/Z − Δ`.
+
+## Evaluation
 
 ```bash
-# (1) Evaluate on 5 sample frames (one scene across all five ZDP shifts)
+# smoke test on the shipped sample (5 frames)
 python eval_foundation_stereo.py --dataset dataset/eval \
     --ckpt weights/fs_zdpshift_signed.pth --signed-volume --d-neg 64 --d-pos 192 --out eval_fs
 
-# (2) In-the-wild inference: 2 real 3D-movie frames (zero-shot FS vs ours)
-python demo_real3d_compare.py dataset/inference demo   # writes demo.png
+# full ZDPShift test split
+python eval_foundation_stereo.py --dataset <zdpshift>/test --ckpt weights/fs_zdpshift_signed.pth \
+    --signed-volume --d-neg 64 --d-pos 192 --out eval_fs
+python eval_igev_signed.py       --dataset <zdpshift>/test --ckpt weights/igev_zdpshift_signed.pth \
+    --d-neg 64 --d-pos 192 --out eval_igev
+python eval_raft_stereo.py       --dataset <zdpshift>/test --ckpt weights/raft_zdpshift.pth --out eval_raft
 ```
 
-```
-dataset/eval/…/frame_1031_00/shift_{-16,+0,+16,+24,+32}/   left.png right.png disparity.npy meta.json
-dataset/inference/                                          {jurassic_world,finding_dory}_{L,R}.png
-```
+## Fine-tuning
 
-## Dataset (full)
-
-Generate ZDPShift from Blender open movies, or download the released renders:
-
-```bash
-python download_scenes.py                 # fetch open-movie source .blend scenes
-python build_config.py                    # write per-scene render configs
-python blender_render.py --config <cfg>   # Cycles render at Δ ∈ {-16,0,+16,+24,+32}
-```
-
-Each pair carries left/right RGB and analytical signed disparity `d(Z,Δ)=fB/Z−Δ`.
-Layout: `<root>/<split>/<scene>/frame_xxxxx/shift_±N/{left.png,right.png,disparity.npy,meta.json}`.
-
-## Training
+Start from each backbone's public SceneFlow checkpoint. The data recipe (multi-Δ
+sampling + SceneFlow rehearsal) fixes the training-distribution blind spot; the
+signed cost volume additionally repairs the cost-volume backbones.
 
 ```bash
 # RAFT-Stereo — data recipe is the whole method (its correlation is already symmetric)
@@ -107,32 +99,16 @@ python train_foundation_stereo.py --train-root <zdpshift>/train --ckpt-init <fs.
 
 Single RTX 3090 (24 GB), fp16, 30–50k iters (3–10 h).
 
-## Evaluation
+## Layout
 
-```bash
-# Full ZDPShift test split
-python eval_foundation_stereo.py --dataset <zdpshift>/test --ckpt weights/fs_zdpshift_signed.pth \
-    --signed-volume --d-neg 64 --d-pos 192 --out eval_fs
-python eval_igev_signed.py       --dataset <zdpshift>/test --ckpt weights/igev_zdpshift_signed.pth \
-    --d-neg 64 --d-pos 192 --out eval_igev
-python eval_raft_stereo.py       --dataset <zdpshift>/test --ckpt weights/raft_zdpshift.pth --out eval_raft
-
-# KITTI-2015 no-regression check (positive regime, disjoint from our data)
-python eval_kitti_fs.py          # KITTI at $SEARAFT_ROOT/datasets/KITTI/training
 ```
-
-## In the wild: real 3D movies
-
-```bash
-# rank side-by-side clips by behind-screen content, then compare zero-shot vs ours
-export SBS_VIDEO_DIR=<dir of SBS .mp4>
-python rank_videos.py <clip_id> ...
-python scan_negative_frames.py <clip.mp4> out/ --squeeze
-python real3d_order_check.py  <clip.mp4> --squeeze          # verify L/R eye order vs monocular depth
-python demo_real3d_compare.py out/ demo --frames F1,F2
+models/     signed cost-volume backbones (IGEV, FoundationStereo) + symmetric RAFT
+data/       ZDPShift + SceneFlow dataset loaders
+train_*.py  fine-tuning entry points
+eval_*.py   evaluation (+ evaluate.py helper)
+weights/    fine-tuned checkpoints (Hugging Face)
+dataset/    sample eval frames
 ```
-
-The L/R order check uses Depth-Anything V2 (vendored `depth_anything_wrapper.py`, via `transformers`).
 
 ## Citation
 
@@ -148,5 +124,4 @@ The L/R order check uses Depth-Anything V2 (vendored `depth_anything_wrapper.py`
 ## License
 
 Code released under the [MIT License](LICENSE). ZDPShift renders derive from
-Blender Studio open movies (CC-BY); film frames in figures/samples are shown for
-research illustration only.
+Blender Studio open movies (CC-BY).

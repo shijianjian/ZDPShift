@@ -1,11 +1,7 @@
 __pycache__/
 *.pyc
-# pretrained checkpoints live on Hugging Face, not in git
 weights/*.pth
 weights/*.tar
-# scratch / large local artifacts
-results*/
-rendered_datasets/
-*.mp4
+out_*/ eval_*/ results*/
 .DS_Store
 env.sh

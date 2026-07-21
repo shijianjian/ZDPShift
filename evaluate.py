@@ -1,7 +1,7 @@
 """
 Evaluate a stereo model across ZDP shifts and produce robustness curves.
 
-Expects a dataset in the layout produced by blender_render.py:
+Expects the ZDPShift dataset layout:
   dataset_root/
     scene_XXX/
       frame_XXXX/
