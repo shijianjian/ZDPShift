@@ -28,7 +28,7 @@ from torch.utils.data import DataLoader
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-FS_DIR = Path(os.environ.get("FOUNDATIONSTEREO_ROOT", os.path.join(os.path.dirname(os.path.abspath(__file__)), "third_party/FoundationStereo")))
+FS_DIR = ROOT / "third_party/FoundationStereo"
 sys.path.insert(0, str(FS_DIR))
 
 from data.zdp_dataset import ZdpStereoDataset, make_val_split

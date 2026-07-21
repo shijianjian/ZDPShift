@@ -37,9 +37,10 @@ pip install -r requirements.txt
 | IGEV-Stereo      | `third_party/IGEV/IGEV-Stereo` | gangweiX/IGEV |
 | RAFT-Stereo      | `third_party/RAFT-Stereo`      | princeton-vl/RAFT-Stereo |
 
-Paths resolve automatically (override via `env.example` only if relocated). Each
-backbone's **SceneFlow init checkpoint** (for training) and FoundationStereo's
-**pretrained weights** (for the zero-shot baseline) come from the upstream repos.
+Backbone paths resolve to the submodules automatically; pull them (above) or the
+imports will error. Each backbone's **SceneFlow init checkpoint** (for training) and
+FoundationStereo's **pretrained weights** (for the zero-shot baseline) come from the
+upstream repos.
 
 ## Weights
 

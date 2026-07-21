@@ -17,7 +17,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-IGEV_ROOT = Path(os.environ.get("IGEV_ROOT", os.path.join(os.path.dirname(os.path.abspath(__file__)), "third_party/IGEV/IGEV-Stereo")))
+IGEV_ROOT = ROOT / "third_party/IGEV/IGEV-Stereo"
 sys.path.insert(0, str(IGEV_ROOT))
 sys.path.insert(0, str(IGEV_ROOT / "core"))
 

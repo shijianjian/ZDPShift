@@ -18,7 +18,7 @@ from omegaconf import OmegaConf
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
-FS_DIR = Path(os.environ.get("FOUNDATIONSTEREO_ROOT", os.path.join(os.path.dirname(os.path.abspath(__file__)), "third_party/FoundationStereo")))
+FS_DIR = ROOT / "third_party/FoundationStereo"
 sys.path.insert(0, str(FS_DIR))
 
 from core.foundation_stereo import FoundationStereo
@@ -61,7 +61,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", required=True)
     ap.add_argument("--ckpt", required=True)
-    ap.add_argument("--cfg", default=os.path.join(os.environ.get("FOUNDATIONSTEREO_ROOT", os.path.join(os.path.dirname(os.path.abspath(__file__)), "third_party/FoundationStereo")), "pretrained_models/11-33-40/cfg.yaml"))
+    ap.add_argument("--cfg", default=str(FS_DIR / "pretrained_models/11-33-40/cfg.yaml"))
     ap.add_argument("--out", required=True)
     ap.add_argument("--iters", type=int, default=32)
     ap.add_argument("--signed-volume", action="store_true")
