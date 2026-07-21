@@ -1,0 +1,17 @@
+# ZDPShift core dependencies (Python 3.10+).
+# Install PyTorch matching your CUDA from https://pytorch.org first, e.g.:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+torch>=2.1
+torchvision>=0.16
+numpy>=1.24
+opencv-python>=4.8
+Pillow>=10.0
+matplotlib>=3.7
+omegaconf>=2.3
+pandas>=2.0
+scipy>=1.10
+tqdm>=4.65
+imageio>=2.31
+# Backbone-specific extras (FoundationStereo pulls DINOv2 via torch.hub):
+timm>=0.9
+einops>=0.7

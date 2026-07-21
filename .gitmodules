@@ -1,0 +1,12 @@
+[submodule "third_party/SEA-RAFT"]
+	path = third_party/SEA-RAFT
+	url = https://github.com/princeton-vl/SEA-RAFT.git
+[submodule "third_party/RAFT-Stereo"]
+	path = third_party/RAFT-Stereo
+	url = https://github.com/princeton-vl/RAFT-Stereo.git
+[submodule "third_party/FoundationStereo"]
+	path = third_party/FoundationStereo
+	url = https://github.com/NVlabs/FoundationStereo.git
+[submodule "third_party/IGEV"]
+	path = third_party/IGEV
+	url = https://github.com/gangweiX/IGEV.git
