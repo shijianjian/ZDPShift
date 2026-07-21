@@ -22,14 +22,18 @@ matchers express negative disparity. Pretrained checkpoints load verbatim.
 The three backbones are git submodules under `third_party/`:
 
 ```bash
-git clone --recursive <this-repo-url> zdpshift
+git clone <this-repo-url> zdpshift
 cd zdpshift
-# (or, if already cloned:  git submodule update --init --depth 1)
+bash setup.sh          # init submodules (pinned commits) + apply compat patches
 
 python -m venv .venv && source .venv/bin/activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements.txt
 ```
+
+`setup.sh` initializes the pinned backbone submodules and applies the small
+compatibility patches in `patches/` (e.g. IGEV's feature extractor for timm ≥1.0)
+that are required to reproduce the results.
 
 | Submodule | Path | Upstream |
 |-----------|------|----------|
