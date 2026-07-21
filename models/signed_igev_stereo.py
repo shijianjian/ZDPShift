@@ -19,7 +19,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-IGEV_ROOT = Path(os.environ.get("IGEV_ROOT", os.path.expanduser("~/git/IGEV-clone/IGEV-Stereo")))
+IGEV_ROOT = Path(__file__).resolve().parent.parent / "third_party/IGEV/IGEV-Stereo"
 if str(IGEV_ROOT) not in sys.path:
     sys.path.insert(0, str(IGEV_ROOT))
 if str(IGEV_ROOT / "core") not in sys.path:

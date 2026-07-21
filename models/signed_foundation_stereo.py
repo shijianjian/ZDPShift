@@ -20,7 +20,7 @@ from pathlib import Path
 import torch
 import torch.nn.functional as F
 
-FS_DIR = Path(os.environ.get("FOUNDATIONSTEREO_ROOT", os.path.expanduser("~/git/FoundationStereo")))
+FS_DIR = Path(__file__).resolve().parent.parent / "third_party/FoundationStereo"
 if str(FS_DIR) not in sys.path:
     sys.path.insert(0, str(FS_DIR))
 
