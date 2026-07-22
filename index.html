@@ -157,27 +157,11 @@
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="wrap">
-    <div class="brand"><span class="z">ZDP</span>Shift</div>
-    <div class="links">
-      <a href="#video">Video</a>
-      <a href="#teaser">Overview</a>
-      <a href="#dataset">Dataset</a>
-      <a href="#results">Results</a>
-    </div>
-  </div>
-</nav>
-
 <!-- HERO -->
-<header class="hero">
+<header class="hero" style="padding:66px 0 54px">
   <div class="wrap">
-    <span class="badge">Under review · ICLR 2027</span>
     <h1 class="title"><span class="zdp">ZDPShift</span><span class="sub">Beyond the Zero-Disparity Plane in Stereo</span></h1>
-    <p class="authors">Anonymous Authors</p>
-    <p class="affil">Paper under double-blind review</p>
-    <div class="btns">
+    <div class="btns" style="margin-top:28px">
       <a class="btn primary" href="#">
         <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm8 1.5V8h4.5L14 3.5z"/></svg>Paper</a>
       <a class="btn ghost" href="#">arXiv</a>
@@ -193,10 +177,12 @@
   </div>
 </div>
 
-<!-- VIDEO (first) -->
-<section id="video" style="padding-top:52px">
+<!-- VIDEO (first, no text) -->
+<section id="video">
   <div class="wrap reveal">
-    <figure>
+    <p class="eyebrow">Video</p>
+    <h2>See the failure — and the fix</h2>
+    <figure style="margin-top:6px">
       <video src="videos/zdp_compare.mp4" poster="assets/_poster_zdp.png" autoplay muted loop playsinline
              style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
     </figure>
@@ -210,21 +196,30 @@
 <!-- TEASER (FS progression) -->
 <section id="teaser">
   <div class="wrap reveal">
-    <figure><img src="assets/teaser.png" alt="FoundationStereo across ZDP shifts, zero-shot vs ours."></figure>
+    <p class="eyebrow">Overview</p>
+    <h2>One frame, five ZDP shifts</h2>
+    <p class="lead">Zero-shot FoundationStereo collapses once the zero-disparity plane pushes content behind the screen; fine-tuned on ZDPShift with a signed cost volume, it stays sub-pixel across the whole range.</p>
+    <figure style="margin-top:8px"><img src="assets/teaser.png" alt="FoundationStereo across ZDP shifts, zero-shot vs ours."></figure>
   </div>
 </section>
 
 <!-- FAILURE CURVE -->
-<section>
+<section id="problem">
   <div class="wrap reveal">
-    <figure style="max-width:760px;margin:0 auto"><img src="assets/performance.png" alt="EPE vs ZDP shift."></figure>
+    <p class="eyebrow">The blind spot</p>
+    <h2>Every backbone breaks at zero</h2>
+    <p class="lead">On a controlled multi-ZDP benchmark, three SOTA backbones all degrade by 19–62× the instant disparity crosses zero. Our method (solid line) stays flat.</p>
+    <figure style="max-width:760px;margin:8px auto 0"><img src="assets/performance.png" alt="EPE vs ZDP shift."></figure>
   </div>
 </section>
 
 <!-- DATASET -->
 <section id="dataset">
   <div class="wrap reveal">
-    <div class="stats">
+    <p class="eyebrow">The dataset</p>
+    <h2>ZDPShift</h2>
+    <p class="lead">4,405 open-movie frames rendered at five zero-disparity-plane shifts each, with analytical <em>signed</em> ground-truth disparity.</p>
+    <div class="stats" style="margin-top:18px">
       <div class="stat"><div class="n">22,025</div><div class="l">stereo pairs</div></div>
       <div class="stat"><div class="n">4,405</div><div class="l">frames × 5 ZDP shifts</div></div>
       <div class="stat"><div class="n">34</div><div class="l">scenes / 7 open movies</div></div>
@@ -239,7 +234,8 @@
   <div class="wrap reveal">
     <p class="eyebrow">Results</p>
     <h2>Sub-pixel across the full regime</h2>
-    <div class="tablewrap" style="margin-top:6px">
+    <p class="lead">End-point error (px) at the hardest shift, $\Delta=+32$. Fine-tuning on ZDPShift helps every backbone; the signed cost volume unlocks the cost-volume models.</p>
+    <div class="tablewrap" style="margin-top:8px">
       <table>
         <thead><tr><th>Model</th><th>Zero-shot</th><th>+ ZDPShift</th><th>+ Signed volume</th></tr></thead>
         <tbody>
@@ -249,13 +245,12 @@
         </tbody>
       </table>
     </div>
-    <p style="color:var(--muted);font-size:.85rem;margin-top:8px">End-point error (px) at the hardest shift, $\Delta=+32$.</p>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <p style="margin-top:6px">Figures © the authors. Source content rendered from Blender Studio open movies (CC-BY). Film frames shown for research illustration.</p>
+    <p>Figures © the authors. Source content rendered from Blender Studio open movies (CC-BY). Film frames shown for research illustration.</p>
   </div>
 </footer>
 
