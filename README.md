@@ -21,6 +21,10 @@ matchers express negative disparity. Pretrained checkpoints load verbatim.
 <img src="assets/performance.png" width="80%">
 </div>
 
+## News
+
+- **[July 2027]** Code, dataset, and pretrained weights released. A detailed technical report is in progress — stay tuned.
+
 ## Quick Start
 
 The three backbones are git submodules under `third_party/`:
