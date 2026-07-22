@@ -76,7 +76,8 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--dataset", required=True)
     p.add_argument("--ckpt", required=True)
-    p.add_argument("--out", required=True)
+    p.add_argument("--out", default="predicted_output")
+    p.add_argument("--no-viz", action="store_true", help="skip GT/prediction images (CSV only)")
     p.add_argument("--symmetric", action="store_true",
                    help="use SymRAFTStereo from raft_stereo_sym.py")
     p.add_argument("--iters", type=int, default=32)
@@ -84,6 +85,7 @@ def main():
                    help="cuda | cpu (fall back to cpu when driver mismatched)")
     args = p.parse_args()
 
+    from evaluate import save_disparity_viz
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
@@ -104,6 +106,8 @@ def main():
         pred = infer(model, L, R, iters=args.iters, device=args.device)
         m = metrics(pred, gt)
         pw.writerow([scene, frame, delta, m["epe"], m["bad_1"], m["bad_3"], m["n"]])
+        if not args.no_viz:
+            save_disparity_viz(out / "images", f"{scene}_{frame}_shift{delta:+d}", L, gt, pred)
         agg.setdefault(delta, []).append(m)
         n_pairs += 1
         if n_pairs % 10 == 0:
@@ -118,7 +122,7 @@ def main():
             mean = lambda k: float(np.mean([x[k] for x in ms if np.isfinite(x[k])]))
             sw.writerow([delta, len(ms), f"{mean('epe'):.3f}",
                          f"{mean('bad_1'):.4f}", f"{mean('bad_3'):.4f}"])
-    print(f"wrote {per_pair_path} and {out/'summary.csv'} ({n_pairs} pairs)")
+    print(f"wrote {per_pair_path}, {out}/summary.csv" + ("" if args.no_viz else f", {out}/images/*.png") + f" ({n_pairs} pairs)")
 
 
 if __name__ == "__main__":

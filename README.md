@@ -74,10 +74,14 @@ Signed ground truth follows the rectified-pair geometry `d(Z,Δ) = fB/Z − Δ`.
 
 ## Evaluation
 
+Each eval writes `per_pair.csv`, `summary.csv`, and per-frame visualizations
+(`images/*.png`: left | GT disparity | prediction | error) to `--out`
+(default `./predicted_output`). Add `--no-viz` for CSV only.
+
 ```bash
 # smoke test on the shipped sample (5 frames)
 python eval_foundation_stereo.py --dataset dataset/eval \
-    --ckpt weights/fs_zdpshift_signed.pth --signed-volume --d-neg 64 --d-pos 192 --out eval_fs
+    --ckpt weights/fs_zdpshift_signed.pth --signed-volume --d-neg 64 --d-pos 192
 
 # full ZDPShift test split
 python eval_foundation_stereo.py --dataset <zdpshift>/test --ckpt weights/fs_zdpshift_signed.pth \

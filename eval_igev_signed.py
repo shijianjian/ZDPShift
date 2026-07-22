@@ -66,12 +66,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", required=True)
     ap.add_argument("--ckpt", required=True)
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out", default="predicted_output")
+    ap.add_argument("--no-viz", action="store_true", help="skip GT/prediction images (CSV only)")
     ap.add_argument("--iters", type=int, default=32)
     ap.add_argument("--d-neg", type=int, default=64)
     ap.add_argument("--d-pos", type=int, default=192)
     args = ap.parse_args()
 
+    from evaluate import save_disparity_viz
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
     model = load_model(args.ckpt, args.d_neg, args.d_pos)
 
@@ -99,6 +101,8 @@ def main():
                          bad_1=float((e > 1).mean()),
                          bad_3=float((e > 3).mean()),
                          n=int(e.size)))
+        if not args.no_viz:
+            save_disparity_viz(out / "images", f"{scene}_{frame}_shift{delta:+d}", L, gt, pred)
         n += 1
         if n % 50 == 0:
             print(f"  ... {n} pairs done ({int(time.time()-t0)}s)")

@@ -43,6 +43,41 @@ except ImportError:
     HAS_MPL = False
 
 
+def save_disparity_viz(out_dir, name, left, gt, pred):
+    """Write a per-frame panel PNG: left | GT disparity | prediction | error.
+
+    GT and prediction share a symmetric colour scale (red = positive / in front
+    of the screen, blue = negative / behind), so the two are directly comparable
+    and the negative regime is visible. `left` may be uint8 or float [0,255].
+    """
+    if not HAS_MPL:
+        return
+    out_dir = Path(out_dir); out_dir.mkdir(parents=True, exist_ok=True)
+    gt = np.asarray(gt, np.float32); pred = np.asarray(pred, np.float32)
+    fin = np.isfinite(gt) & np.isfinite(pred)
+    gfin = gt[np.isfinite(gt)]
+    vmax = float(np.percentile(np.abs(gfin), 95)) if gfin.size else 1.0
+    vmax = vmax or 1.0
+    err = np.where(fin, np.abs(pred - gt), np.nan)
+    emax = float(np.nanpercentile(err[fin], 95)) if fin.any() else 1.0
+    emax = emax or 1.0
+    gt_v = np.where(np.isfinite(gt), gt, np.nan)
+    pr_v = np.where(np.isfinite(pred), pred, np.nan)
+
+    fig, ax = plt.subplots(1, 4, figsize=(17, 3.4))
+    ax[0].imshow(np.clip(left, 0, 255).astype("uint8")); ax[0].set_title("left")
+    im1 = ax[1].imshow(gt_v, cmap="RdBu_r", vmin=-vmax, vmax=vmax); ax[1].set_title("GT disparity")
+    ax[2].imshow(pr_v, cmap="RdBu_r", vmin=-vmax, vmax=vmax); ax[2].set_title("prediction")
+    im3 = ax[3].imshow(err, cmap="inferno", vmin=0, vmax=emax); ax[3].set_title("error |pred$-$GT|")
+    for a in ax:
+        a.axis("off")
+    fig.colorbar(im1, ax=ax[1], fraction=0.046, pad=0.02)
+    fig.colorbar(im3, ax=ax[3], fraction=0.046, pad=0.02)
+    fig.tight_layout()
+    fig.savefig(out_dir / f"{name}.png", dpi=110, bbox_inches="tight")
+    plt.close(fig)
+
+
 # =============================================================================
 # Dataset loader
 # =============================================================================

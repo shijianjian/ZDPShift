@@ -62,13 +62,16 @@ def main():
     ap.add_argument("--dataset", required=True)
     ap.add_argument("--ckpt", required=True)
     ap.add_argument("--cfg", default=str(ROOT / "configs/foundationstereo.yaml"))
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out", default="predicted_output")
     ap.add_argument("--iters", type=int, default=32)
     ap.add_argument("--signed-volume", action="store_true")
     ap.add_argument("--d-neg", type=int, default=64)
     ap.add_argument("--d-pos", type=int, default=192)
+    ap.add_argument("--no-viz", action="store_true",
+                    help="skip saving GT/prediction images (CSV only)")
     args = ap.parse_args()
 
+    from evaluate import save_disparity_viz
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
     model = load_model(args.ckpt, args.cfg, args.signed_volume, args.d_neg, args.d_pos)
 
@@ -94,6 +97,8 @@ def main():
         rows.append(dict(scene=scene, frame=frame, delta=delta,
                          epe=float(e.mean()), bad_1=float((e > 1).mean()),
                          bad_3=float((e > 3).mean()), n=int(e.size)))
+        if not args.no_viz:
+            save_disparity_viz(out / "images", f"{scene}_{frame}_shift{delta:+d}", L, gt, pred)
         n += 1
         if n % 50 == 0:
             print(f"  ... {n} pairs done ({int(time.time()-t0)}s)", flush=True)
@@ -111,7 +116,10 @@ def main():
             b3 = float(np.mean([r["bad_3"] for r in ls]))
             w.writerow([d, len(ls), epe, b1, b3])
             print(f"  Δ={d:+3d}: EPE={epe:7.3f} bad_1={b1*100:5.1f}% bad_3={b3*100:5.1f}%", flush=True)
-    print(f"\nwrote {out}/per_pair.csv, {out}/summary.csv", flush=True)
+    msg = f"\nwrote {out}/per_pair.csv, {out}/summary.csv"
+    if not args.no_viz:
+        msg += f", {out}/images/*.png"
+    print(msg, flush=True)
 
 
 if __name__ == "__main__":

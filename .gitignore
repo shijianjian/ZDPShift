@@ -7,3 +7,4 @@ eval_*/
 results*/
 .DS_Store
 env.sh
+predicted_output/
