@@ -21,7 +21,7 @@ matchers express negative disparity. Pretrained checkpoints load verbatim.
 <img src="assets/performance.png" width="80%">
 </div>
 
-## Install
+## Quick Start
 
 The three backbones are git submodules under `third_party/`:
 
@@ -35,30 +35,23 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements.txt
 ```
 
-The backbones are used unmodified; `requirements.txt` pins `timm==1.0.26` (the
-version the results were produced with).
+Download the fine-tuned checkpoints into `weights/`:
 
-| Submodule | Path | Upstream |
-|-----------|------|----------|
-| FoundationStereo | `third_party/FoundationStereo` | NVlabs/FoundationStereo |
-| IGEV-Stereo      | `third_party/IGEV/IGEV-Stereo` | gangweiX/IGEV |
-| RAFT-Stereo      | `third_party/RAFT-Stereo`      | princeton-vl/RAFT-Stereo |
+```bash
+huggingface-cli download shijianjian/ZDPShift --local-dir weights
+```
 
-Backbone paths resolve to the submodules automatically; pull them (above) or the
-imports will error. Each backbone's **SceneFlow init checkpoint** (for training) and
-FoundationStereo's **pretrained weights** (for the zero-shot baseline) come from the
-upstream repos.
+| File | Backbone | mean EPE |
+|------|----------|----------|
+| `raft_zdpshift.pth`        | RAFT-Stereo (data recipe)        | 0.97 px |
+| `igev_zdpshift_signed.pth` | IGEV-Stereo + signed volume      | 0.92 px |
+| `fs_zdpshift_signed.pth`   | FoundationStereo + signed volume | **0.76 px** |
 
-## Weights
-
-Fine-tuned ZDPShift checkpoints go in `weights/` (hosted on Hugging Face; see
-[`weights/README.md`](weights/README.md)):
-
-| File | Backbone | Route | mean EPE |
-|------|----------|-------|----------|
-| `weights/raft_zdpshift.pth`        | RAFT-Stereo      | data recipe          | 0.97 px |
-| `weights/igev_zdpshift_signed.pth` | IGEV-Stereo      | + signed cost volume | 0.92 px |
-| `weights/fs_zdpshift_signed.pth`   | FoundationStereo | + signed cost volume | **0.76 px** |
+```bash
+# smoke test on the shipped sample (5 frames)
+python eval_foundation_stereo.py --dataset dataset/eval \
+    --ckpt weights/fs_zdpshift_signed.pth --signed-volume --d-neg 64 --d-pos 192
+```
 
 ## Dataset
 
@@ -79,10 +72,6 @@ Each eval writes `per_pair.csv`, `summary.csv`, and per-frame visualizations
 (default `./predicted_output`). Add `--no-viz` for CSV only.
 
 ```bash
-# smoke test on the shipped sample (5 frames)
-python eval_foundation_stereo.py --dataset dataset/eval \
-    --ckpt weights/fs_zdpshift_signed.pth --signed-volume --d-neg 64 --d-pos 192
-
 # full ZDPShift test split
 python eval_foundation_stereo.py --dataset <zdpshift>/test --ckpt weights/fs_zdpshift_signed.pth \
     --signed-volume --d-neg 64 --d-pos 192 --out eval_fs
@@ -121,6 +110,19 @@ eval_*.py   evaluation (+ evaluate.py helper)
 weights/    fine-tuned checkpoints (Hugging Face)
 dataset/    sample eval frames
 ```
+
+The backbones are used unmodified; `requirements.txt` pins `timm==1.0.26` (the
+version the results were produced with).
+
+| Submodule | Path | Upstream |
+|-----------|------|----------|
+| FoundationStereo | `third_party/FoundationStereo` | NVlabs/FoundationStereo |
+| IGEV-Stereo      | `third_party/IGEV/IGEV-Stereo` | gangweiX/IGEV |
+| RAFT-Stereo      | `third_party/RAFT-Stereo`      | princeton-vl/RAFT-Stereo |
+
+Backbone paths resolve to the submodules automatically; pull them (above) or the
+imports will error. Fine-tuning additionally needs each backbone's public
+**SceneFlow init checkpoint** from its upstream repo.
 
 ## License
 
