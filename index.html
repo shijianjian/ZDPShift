@@ -162,14 +162,10 @@
   <div class="wrap">
     <div class="brand"><span class="z">ZDP</span>Shift</div>
     <div class="links">
-      <a href="#abstract">Abstract</a>
-      <a href="#problem">Problem</a>
-      <a href="#dataset">Dataset</a>
-      <a href="#method">Method</a>
-      <a href="#results">Results</a>
       <a href="#video">Video</a>
-      <a href="#wild">In the wild</a>
-      <a href="#bibtex">BibTeX</a>
+      <a href="#teaser">Overview</a>
+      <a href="#dataset">Dataset</a>
+      <a href="#results">Results</a>
     </div>
   </div>
 </nav>
@@ -188,7 +184,6 @@
       <a class="btn ghost" href="#">
         <svg viewBox="0 0 24 24"><path d="M12 .5A11.5 11.5 0 0 0 8.4 22.9c.6.1.8-.2.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 4.6 18 5 18 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg>Code</a>
       <a class="btn ghost" href="#">Dataset</a>
-      <a class="btn ghost" href="#bibtex">BibTeX</a>
     </div>
   </div>
 </header>
@@ -198,90 +193,44 @@
   </div>
 </div>
 
-<!-- TEASER -->
-<section>
+<!-- VIDEO (first) -->
+<section id="video" style="padding-top:52px">
   <div class="wrap reveal">
     <figure>
-      <img src="assets/teaser.png" alt="Adjusting the zero-disparity plane across ZDP shifts.">
-      <figcaption><b>Adjusting the zero-disparity plane (ZDP).</b> One frame at three ZDP shifts&nbsp;$\Delta$. Top: signed ground-truth disparity (<span class="pos">red = positive</span>, in front of screen; <span class="neg">blue = negative</span>, behind). Bottom: the ZDP plane at $Z_\text{ZDP}=fB/\Delta$ slides toward the cameras as&nbsp;$\Delta$ grows, sending more of the scene into negative disparity.</figcaption>
+      <video src="videos/zdp_compare.mp4" poster="assets/_poster_zdp.png" autoplay muted loop playsinline
+             style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
+    </figure>
+    <figure style="margin-top:22px">
+      <video src="videos/jw_compare.mp4" poster="assets/_poster_jw.png" autoplay muted loop playsinline
+             style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
     </figure>
   </div>
 </section>
 
-<!-- ABSTRACT -->
-<section id="abstract">
+<!-- TEASER (FS progression) -->
+<section id="teaser">
   <div class="wrap reveal">
-    <p class="eyebrow">Abstract</p>
-    <h2>Stereo matching, on both sides of the screen</h2>
-    <p class="lead">
-      Modern stereo matchers fail by <span class="hl">19–62×</span> when disparity becomes negative. Yet stereoscopic
-      content, from cinema&nbsp;3D to VR, lives in exactly that regime. The failure is structural: (1)&nbsp;standard
-      benchmarks always place the zero-disparity plane at infinity, so no training pixel is ever negative; and
-      (2)&nbsp;popular cost-volume architectures assume positive disparity by construction. We address both. First, we
-      release <b>ZDPShift</b>, a calibrated open-movie stereo dataset rendering 4,405&nbsp;frames at five
-      zero-disparity-plane shifts each, with analytical ground-truth disparities. Second, we introduce a
-      <b>signed cost volume</b> that searches negative as well as positive disparities&nbsp;— a parameter-free
-      generalization of the one-sided volume every prior matcher relies on. Fine-tuned on ZDPShift, our matchers are the
-      first to hold <b>sub-pixel accuracy across the full negative-disparity regime</b>.
-    </p>
+    <figure><img src="assets/teaser.png" alt="FoundationStereo across ZDP shifts, zero-shot vs ours."></figure>
   </div>
 </section>
 
-<!-- PROBLEM -->
-<section id="problem">
+<!-- FAILURE CURVE -->
+<section>
   <div class="wrap reveal">
-    <p class="eyebrow">The blind spot</p>
-    <h2>Every backbone breaks at zero</h2>
-    <p class="lead">On a controlled multi-ZDP benchmark, RAFT-Stereo, IGEV-Stereo and FoundationStereo all degrade by
-      <span class="hl">19–62×</span> the instant the ZDP moves content behind the screen&nbsp;— on the <em>same</em>
-      scene content. Our method (solid line) stays flat across the full range.</p>
-    <figure style="max-width:680px;margin:26px auto 0">
-      <img src="assets/failure_curve.png" alt="EPE vs ZDP shift for SOTA backbones and ours.">
-      <figcaption>End-point error (EPE) vs ZDP shift&nbsp;$\Delta$. Shaded region = negative-disparity regime.</figcaption>
-    </figure>
+    <figure style="max-width:760px;margin:0 auto"><img src="assets/performance.png" alt="EPE vs ZDP shift."></figure>
   </div>
 </section>
 
 <!-- DATASET -->
 <section id="dataset">
   <div class="wrap reveal">
-    <p class="eyebrow">The dataset</p>
-    <h2>ZDPShift</h2>
     <div class="stats">
       <div class="stat"><div class="n">22,025</div><div class="l">stereo pairs</div></div>
       <div class="stat"><div class="n">4,405</div><div class="l">frames × 5 ZDP shifts</div></div>
       <div class="stat"><div class="n">34</div><div class="l">scenes / 7 open movies</div></div>
       <div class="stat"><div class="n">signed</div><div class="l">analytical GT disparity</div></div>
     </div>
-    <p class="lead" style="margin-top:26px">Rendered from seven Blender Studio open movies at native 1920×1280 with the
-      Cycles path tracer. Each scene is rendered at five ZDP shifts $\Delta\in\{-16,0,+16,+24,+32\}$&nbsp;px, shifting the
-      principal points while keeping cameras parallel&nbsp;— so the rectified-pair assumption holds and per-pixel signed
-      ground truth follows analytically. A rendering-correctness protocol neutralizes defocus, motion blur, and compositing
-      so every labeled pixel has a valid photometric correspondence.</p>
-    <figure style="margin-top:24px"><img src="assets/gallery.png" alt="ZDPShift scene gallery."><figcaption>Scene gallery: Caminandes, Spring, Sprite Fright, Settlers, Agent 327, Charge, Project Gold.</figcaption></figure>
-  </div>
-</section>
-
-<!-- METHOD -->
-<section id="method">
-  <div class="wrap reveal">
-    <p class="eyebrow">The method</p>
-    <h2>A signed cost volume</h2>
-    <p class="lead">Per-pixel ground truth follows the rectified-pair geometry, with the ZDP set by the shift&nbsp;$\Delta$:</p>
-    <div class="eq">$d(Z,\Delta) \;=\; \dfrac{fB}{Z} \;-\; \Delta$</div>
-    <p class="lead">Cost-volume matchers build correlation over the one-sided range $[0,\,d_\text{max}]$, making negative
-      disparity <em>inexpressible</em>. We extend the index range to $[-d_\text{neg},\,d_\text{pos}]$ and offset the
-      soft-argmax over the signed bins. The reformulation adds <b>no learnable parameters</b>: every layer downstream of
-      the volume is translation-invariant along the disparity axis, so pretrained checkpoints load verbatim.</p>
-    <div class="two">
-      <div class="card"><h3><span class="dot" style="background:var(--pos)"></span>Data recipe</h3>
-        <p>Training samples span all five ZDP shifts, with SceneFlow rehearsal to retain positive-disparity competence.
-          This fixes the training-distribution blind spot for every backbone.</p></div>
-      <div class="card"><h3><span class="dot" style="background:var(--neg)"></span>Two halves of one problem</h3>
-        <p>The ZDP is an unrecorded, per-scene authoring choice, so it cannot be normalized away by a global shift. Geometry
-          is only half the failure: a matcher trained on non-negative data is biased across zero. Data recipe and signed
-          volume are complementary.</p></div>
-    </div>
+    <figure style="margin-top:26px"><img src="assets/gallery.png" alt="ZDPShift scene gallery."></figure>
   </div>
 </section>
 
@@ -290,125 +239,29 @@
   <div class="wrap reveal">
     <p class="eyebrow">Results</p>
     <h2>Sub-pixel across the full regime</h2>
-    <p class="lead">End-point error (px) at the hardest shift, <b>$\Delta=+32$</b>. Fine-tuning on ZDPShift helps every
-      backbone; the signed cost volume is what unlocks the cost-volume models.</p>
-    <div class="tablewrap" style="margin-top:18px">
+    <div class="tablewrap" style="margin-top:6px">
       <table>
         <thead><tr><th>Model</th><th>Zero-shot</th><th>+ ZDPShift</th><th>+ Signed volume</th></tr></thead>
         <tbody>
-          <tr><td>RAFT-Stereo</td><td class="drop">47.54</td><td class="best">1.01</td><td>—<sup>†</sup></td></tr>
+          <tr><td>RAFT-Stereo</td><td class="drop">47.54</td><td class="best">1.01</td><td>—</td></tr>
           <tr><td>IGEV-Stereo</td><td class="drop">21.61</td><td>4.89</td><td class="best">0.94</td></tr>
           <tr><td>FoundationStereo</td><td class="drop">58.13</td><td>11.11</td><td class="best">0.81</td></tr>
         </tbody>
       </table>
     </div>
-    <p style="color:var(--muted);font-size:.84rem;margin-top:8px"><sup>†</sup>RAFT-Stereo uses all-pairs correlation and
-      needs only the data recipe; the signed volume applies to cost-volume backbones.</p>
-    <figure style="margin-top:24px"><img src="assets/progression.png" alt="FoundationStereo error maps across ZDP shifts.">
-      <figcaption>FoundationStereo error across&nbsp;$\Delta$: zero-shot collapses and data-only fine-tuning degrades as disparity crosses zero, while the signed volume stays uniformly low.</figcaption></figure>
-  </div>
-</section>
-
-<!-- VIDEO -->
-<section id="video">
-  <div class="wrap reveal">
-    <p class="eyebrow">Video</p>
-    <h2>See the failure — and the fix</h2>
-    <p class="lead">Panels: <b>left</b> · <b>ground truth</b> (rendered only) · <b>FoundationStereo (zero-shot)</b> ·
-      <b>FoundationStereo + ours</b>. Zero-shot forces everything <span class="pos">positive</span> (red); ours recovers
-      the <span class="neg">behind-screen</span> (blue) regime.</p>
-    <figure>
-      <video src="videos/zdp_compare.mp4" autoplay muted loop playsinline
-             style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
-      <figcaption>Rendered ZDPShift scene at $\Delta{=}{+}32$, <em>with ground truth</em>: zero-shot FoundationStereo
-        collapses in the negative regime while ours tracks GT.</figcaption>
-    </figure>
-    <figure style="margin-top:26px">
-      <video src="videos/jw_compare.mp4" autoplay muted loop playsinline
-             style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
-      <figcaption>Real 3D movie (<em>Jurassic World</em>): zero-shot forces the receding scene positive; ours recovers
-        the behind-screen depth. Verified against sign-agnostic optical flow.</figcaption>
-    </figure>
-  </div>
-</section>
-
-<!-- IN THE WILD -->
-<section id="wild">
-  <div class="wrap reveal">
-    <p class="eyebrow">In the wild</p>
-    <h2>Real 3D movies live behind the screen</h2>
-    <p class="lead">On frames from released stereoscopic films&nbsp;— live action and animation&nbsp;— most pixels already
-      sit <span class="neg">behind the screen</span>. Zero-shot FoundationStereo cannot represent it and forces everything
-      <span class="pos">positive</span>; our signed matcher recovers it, matching sign-agnostic optical flow to ≈1&nbsp;px.
-      <b>Drag the handle</b> to compare.</p>
-
-    <div class="slider" id="cmp">
-      <img src="assets/slider_zeroshot.png" alt="zero-shot disparity">
-      <div class="after"><img src="assets/slider_ours.png" alt="ours disparity"></div>
-      <div class="tag l">Zero-shot FS</div>
-      <div class="tag r">+ Ours (signed)</div>
-      <div class="handle"></div>
-    </div>
-    <figcaption style="text-align:center;color:var(--muted);font-size:.9rem;margin-top:12px">
-      <em>Jurassic World</em> (3D). <span class="pos">Red</span> = in front of screen, <span class="neg">blue</span> = behind.
-      Zero-shot reports 0% behind-screen; ours recovers 90%.</figcaption>
-
-    <figure style="margin-top:30px"><img src="assets/real3d.png" alt="Signed disparity on Jurassic World and Finding Dory.">
-      <figcaption>Two commercial 3D films (Jurassic World, live action; Finding Dory, animation). Zero-shot forces the receding scene positive; ours recovers the behind-screen regime, verified against optical flow.</figcaption></figure>
-  </div>
-</section>
-
-<!-- BIBTEX -->
-<section id="bibtex">
-  <div class="wrap reveal">
-    <p class="eyebrow">Citation</p>
-    <h2>BibTeX</h2>
-    <pre><button class="copy" onclick="navigator.clipboard.writeText(document.getElementById('bib').innerText)">Copy</button><code id="bib">@inproceedings{zdpshift2027,
-  title     = {ZDPShift: Beyond the Zero-Disparity Plane in Stereo},
-  author    = {Anonymous Authors},
-  booktitle = {Under review at the International Conference
-               on Learning Representations (ICLR)},
-  year      = {2027}
-}</code></pre>
+    <p style="color:var(--muted);font-size:.85rem;margin-top:8px">End-point error (px) at the hardest shift, $\Delta=+32$.</p>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <p class="note">Template page&nbsp;— fill in the author list, paper / arXiv / code / dataset links, and BibTeX before publishing (marked <code>#</code> / <code>TODO</code> in <code>index.html</code>).</p>
-    <p style="margin-top:18px">Figures © the authors. Source content rendered from Blender Studio open movies (CC-BY). Film frames shown for research illustration.</p>
+    <p style="margin-top:6px">Figures © the authors. Source content rendered from Blender Studio open movies (CC-BY). Film frames shown for research illustration.</p>
   </div>
 </footer>
 
 <script>
-  // reveal-on-scroll
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-
-  // before/after slider
-  (function(){
-    const s=document.getElementById('cmp'); if(!s) return;
-    const after=s.querySelector('.after'), handle=s.querySelector('.handle');
-    const base=s.querySelector('img');
-    function setW(px){
-      const r=s.getBoundingClientRect();
-      let p=Math.max(0,Math.min(1,px/r.width));
-      after.style.width=(p*100)+'%';
-      after.querySelector('img').style.width=r.width+'px';
-      handle.style.left=(p*100)+'%';
-    }
-    function fromEvent(e){const r=s.getBoundingClientRect();const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;setW(x);}
-    let drag=false;
-    s.addEventListener('mousedown',e=>{drag=true;fromEvent(e);});
-    window.addEventListener('mousemove',e=>{if(drag)fromEvent(e);});
-    window.addEventListener('mouseup',()=>drag=false);
-    s.addEventListener('touchstart',e=>{drag=true;fromEvent(e);},{passive:true});
-    s.addEventListener('touchmove',e=>{if(drag)fromEvent(e);},{passive:true});
-    s.addEventListener('touchend',()=>drag=false);
-    base.addEventListener('load',()=>setW(s.getBoundingClientRect().width/2));
-    window.addEventListener('resize',()=>setW(s.getBoundingClientRect().width*(parseFloat(handle.style.left||'50')/100)));
-    setTimeout(()=>setW(s.getBoundingClientRect().width/2),200);
-  })();
 </script>
 </body>
 </html>
