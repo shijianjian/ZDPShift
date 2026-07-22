@@ -76,6 +76,7 @@
   .btn.ghost{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.24)}
   .btn.ghost:hover{background:rgba(255,255,255,.16);transform:translateY(-2px);text-decoration:none}
   .btn svg{width:17px;height:17px;fill:currentColor}
+  .btn.disabled{opacity:.4;pointer-events:none;cursor:not-allowed}
 
   /* ---------- key line under hero ---------- */
   .keyline{background:var(--navy);color:#c9d3e8;text-align:center;padding:4px 0 44px}
@@ -162,12 +163,12 @@
   <div class="wrap">
     <h1 class="title"><span class="zdp">ZDPShift</span><span class="sub">Beyond the Zero-Disparity Plane in Stereo</span></h1>
     <div class="btns" style="margin-top:28px">
-      <a class="btn primary" href="#">
+      <a class="btn primary disabled" aria-disabled="true" title="coming soon">
         <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm8 1.5V8h4.5L14 3.5z"/></svg>Paper</a>
-      <a class="btn ghost" href="#">arXiv</a>
-      <a class="btn ghost" href="#">
+      <a class="btn ghost disabled" aria-disabled="true" title="coming soon">arXiv</a>
+      <a class="btn ghost" href="https://github.com/shijianjian/ZDPShift" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24"><path d="M12 .5A11.5 11.5 0 0 0 8.4 22.9c.6.1.8-.2.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 4.6 18 5 18 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg>Code</a>
-      <a class="btn ghost" href="#">Dataset</a>
+      <a class="btn ghost" href="https://huggingface.co/datasets/shijianjian/ZDPShift" target="_blank" rel="noopener">Dataset</a>
     </div>
   </div>
 </header>
