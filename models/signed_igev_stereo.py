@@ -25,6 +25,20 @@ if str(IGEV_ROOT) not in sys.path:
 if str(IGEV_ROOT / "core") not in sys.path:
     sys.path.insert(0, str(IGEV_ROOT / "core"))
 
+# timm-compat shim: timm >=0.6 fuses BN+activation into `bn1` (BatchNormAct2d)
+# and drops the separate `model.act1` that IGEV's feature extractor reads. We
+# restore it as Identity so the pristine upstream IGEV runs unmodified on the
+# modern timm that FoundationStereo requires (no-op on older timm). This keeps
+# the IGEV submodule untouched.
+import timm as _timm
+_timm_create_model = _timm.create_model
+def _create_model_act1_compat(*args, **kwargs):
+    model = _timm_create_model(*args, **kwargs)
+    if not hasattr(model, "act1"):
+        model.act1 = nn.Identity()
+    return model
+_timm.create_model = _create_model_act1_compat
+
 from core.igev_stereo import IGEVStereo, autocast
 from core.geometry import Combined_Geo_Encoding_Volume
 from core.submodule import groupwise_correlation, context_upsample
