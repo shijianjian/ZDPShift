@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZDPShift · Beyond the Zero-Disparity Plane in Stereo</title>
+<meta name="description" content="ZDPShift: a calibrated open-movie stereo dataset and a signed cost volume for stereo matching beyond the zero-disparity plane (negative disparity).">
+<meta property="og:title" content="ZDPShift: Beyond the Zero-Disparity Plane in Stereo">
+<meta property="og:description" content="Modern stereo matchers fail by 19–62× when disparity becomes negative. ZDPShift fixes it with a calibrated multi-ZDP dataset and a signed cost volume.">
+<meta property="og:image" content="assets/teaser.png">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  MathJax = { tex: {inlineMath: [['$','$']]}, svg:{fontCache:'global'} };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#0d1117; --muted:#5b6472; --line:#e8ebf0;
+    --pos:#e23b3b;         /* positive / in front / pop-out */
+    --neg:#2563eb;         /* negative / behind screen */
+    --navy:#0b1020;
+    --card:#f7f9fc;
+    --accentgrad:linear-gradient(120deg,#e23b3b 0%,#a21caf 45%,#2563eb 100%);
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    line-height:1.65;font-size:17px;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+  a{color:var(--neg);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  /* ---------- top nav ---------- */
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);
+    backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+  nav .brand{font-weight:800;letter-spacing:-0.02em;font-size:1.05rem}
+  nav .brand .z{background:var(--accentgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  nav .links{display:flex;gap:22px;font-size:.92rem;font-weight:500}
+  nav .links a{color:var(--muted)}
+  nav .links a:hover{color:var(--ink);text-decoration:none}
+  @media(max-width:680px){nav .links{display:none}}
+
+  /* ---------- hero ---------- */
+  header.hero{position:relative;overflow:hidden;background:var(--navy);color:#fff;
+    padding:76px 0 66px;text-align:center}
+  header.hero::before{content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(60% 60% at 20% 0%,rgba(226,59,59,.35),transparent 60%),
+      radial-gradient(55% 55% at 85% 20%,rgba(37,99,235,.42),transparent 60%),
+      radial-gradient(50% 50% at 60% 100%,rgba(162,28,175,.30),transparent 60%);
+    filter:blur(6px)}
+  header.hero .wrap{position:relative}
+  .badge{display:inline-block;padding:6px 15px;border-radius:999px;font-size:.8rem;
+    font-weight:600;letter-spacing:.02em;background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.2);color:#dbe3f4;margin-bottom:22px}
+  h1.title{font-size:clamp(2.1rem,5vw,3.5rem);line-height:1.05;font-weight:900;
+    letter-spacing:-0.035em;margin:0}
+  h1.title .zdp{background:linear-gradient(110deg,#ff7a7a,#c084fc,#7aa8ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  h1.title .sub{display:block;font-size:clamp(1rem,2.4vw,1.55rem);font-weight:600;
+    color:#c3ccdf;margin-top:16px;letter-spacing:-0.02em}
+  .authors{margin:26px 0 4px;font-size:1.05rem;color:#eef2fb;font-weight:500}
+  .affil{color:#9aa6bf;font-size:.94rem;margin:0}
+
+  .btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:30px 0 4px}
+  .btn{display:inline-flex;align-items:center;gap:9px;padding:11px 20px;border-radius:999px;
+    font-weight:600;font-size:.95rem;transition:.18s;border:1px solid transparent}
+  .btn.primary{background:#fff;color:var(--navy)}
+  .btn.primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.35);text-decoration:none}
+  .btn.ghost{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.24)}
+  .btn.ghost:hover{background:rgba(255,255,255,.16);transform:translateY(-2px);text-decoration:none}
+  .btn svg{width:17px;height:17px;fill:currentColor}
+
+  /* ---------- key line under hero ---------- */
+  .keyline{background:var(--navy);color:#c9d3e8;text-align:center;padding:0 0 40px}
+  .keyline .big{font-size:clamp(1.05rem,2.6vw,1.5rem);font-weight:700;color:#fff;letter-spacing:-0.02em}
+  .keyline .big b{background:linear-gradient(110deg,#ff7a7a,#7aa8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* ---------- sections ---------- */
+  section{padding:66px 0;border-bottom:1px solid var(--line)}
+  .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.76rem;font-weight:700;
+    color:var(--neg);margin:0 0 10px}
+  h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:800;letter-spacing:-0.025em;margin:0 0 20px}
+  p.lead{font-size:1.08rem;color:#26303f}
+  figure{margin:0}
+  figure img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);
+    display:block;box-shadow:0 20px 50px -30px rgba(10,20,50,.4)}
+  figcaption{color:var(--muted);font-size:.9rem;margin-top:12px;text-align:center}
+  .pos{color:var(--pos);font-weight:700}
+  .neg{color:var(--neg);font-weight:700}
+  .hl{background:linear-gradient(180deg,transparent 62%,rgba(226,59,59,.22) 0);font-weight:600}
+
+  /* ---------- stat cards ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:6px 0 8px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 16px;text-align:center;
+    transition:.18s}
+  .stat:hover{transform:translateY(-3px);box-shadow:0 16px 40px -24px rgba(10,20,50,.45)}
+  .stat .n{font-size:2rem;font-weight:900;letter-spacing:-0.03em;
+    background:var(--accentgrad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat .l{color:var(--muted);font-size:.82rem;margin-top:4px;font-weight:500}
+  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  /* ---------- before/after slider ---------- */
+  .slider{position:relative;max-width:760px;margin:8px auto 0;border-radius:16px;overflow:hidden;
+    border:1px solid var(--line);box-shadow:0 24px 60px -34px rgba(10,20,50,.5);user-select:none;cursor:ew-resize}
+  .slider img{display:block;width:100%;height:auto}
+  .slider .after{position:absolute;inset:0;overflow:hidden;width:50%}
+  .slider .after img{position:absolute;top:0;left:0;height:100%;width:auto;max-width:none}
+  .slider .handle{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);
+    box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+  .slider .handle::after{content:"◄ ►";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:#fff;color:var(--navy);font-size:.68rem;font-weight:800;letter-spacing:1px;
+    padding:6px 8px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  .slider .tag{position:absolute;top:12px;padding:5px 11px;border-radius:999px;font-size:.76rem;font-weight:700;color:#fff}
+  .slider .tag.l{left:12px;background:rgba(90,90,90,.85)}
+  .slider .tag.r{right:12px;background:var(--neg)}
+
+  /* ---------- method ---------- */
+  .eq{text-align:center;font-size:1.15rem;margin:18px 0;padding:20px;
+    background:var(--card);border:1px solid var(--line);border-radius:16px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .card h3{margin:0 0 8px;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+  .card .dot{width:9px;height:9px;border-radius:50%}
+  @media(max-width:720px){.two{grid-template-columns:1fr}}
+
+  /* ---------- table ---------- */
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+  table{border-collapse:collapse;width:100%;font-size:.96rem}
+  th,td{padding:13px 14px;text-align:center;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left;font-weight:600}
+  thead th{background:var(--card);font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#fafbfe}
+  td.best{color:var(--pos);font-weight:800}
+  .drop{color:var(--muted)}
+  .arrow{color:var(--neg);font-weight:700}
+
+  /* ---------- bibtex ---------- */
+  pre{background:#0d1220;color:#e8eef7;border-radius:16px;padding:22px;overflow-x:auto;
+    font-family:'JetBrains Mono',monospace;font-size:.85rem;line-height:1.6;position:relative}
+  .copy{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.1);color:#cdd6e6;border:1px solid rgba(255,255,255,.2);
+    border-radius:8px;padding:5px 11px;font-size:.78rem;font-weight:600;cursor:pointer}
+  .copy:hover{background:rgba(255,255,255,.2)}
+
+  .note{background:#fff8e6;border:1px solid #f0e0a8;border-radius:12px;padding:13px 17px;color:#6a5a1e;font-size:.9rem}
+  footer{padding:36px 0 60px;text-align:center;color:var(--muted);font-size:.88rem}
+  .reveal{opacity:0;transform:translateY(18px);transition:.6s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="z">ZDP</span>Shift</div>
+    <div class="links">
+      <a href="#abstract">Abstract</a>
+      <a href="#problem">Problem</a>
+      <a href="#dataset">Dataset</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#video">Video</a>
+      <a href="#wild">In the wild</a>
+      <a href="#bibtex">BibTeX</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <span class="badge">Under review · ICLR 2027</span>
+    <h1 class="title"><span class="zdp">ZDPShift</span><span class="sub">Beyond the Zero-Disparity Plane in Stereo</span></h1>
+    <p class="authors">Anonymous Authors</p>
+    <p class="affil">Paper under double-blind review</p>
+    <div class="btns">
+      <a class="btn primary" href="#">
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm8 1.5V8h4.5L14 3.5z"/></svg>Paper</a>
+      <a class="btn ghost" href="#">arXiv</a>
+      <a class="btn ghost" href="#">
+        <svg viewBox="0 0 24 24"><path d="M12 .5A11.5 11.5 0 0 0 8.4 22.9c.6.1.8-.2.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 4.6 18 5 18 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg>Code</a>
+      <a class="btn ghost" href="#">Dataset</a>
+      <a class="btn ghost" href="#bibtex">BibTeX</a>
+    </div>
+  </div>
+</header>
+<div class="keyline">
+  <div class="wrap">
+    <p class="big">Modern stereo matchers fail by <b>19–62×</b> the moment disparity turns negative.<br>Stereoscopic content, from cinema&nbsp;3D to VR, lives there.</p>
+  </div>
+</div>
+
+<!-- TEASER -->
+<section>
+  <div class="wrap reveal">
+    <figure>
+      <img src="assets/teaser.png" alt="Adjusting the zero-disparity plane across ZDP shifts.">
+      <figcaption><b>Adjusting the zero-disparity plane (ZDP).</b> One frame at three ZDP shifts&nbsp;$\Delta$. Top: signed ground-truth disparity (<span class="pos">red = positive</span>, in front of screen; <span class="neg">blue = negative</span>, behind). Bottom: the ZDP plane at $Z_\text{ZDP}=fB/\Delta$ slides toward the cameras as&nbsp;$\Delta$ grows, sending more of the scene into negative disparity.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ABSTRACT -->
+<section id="abstract">
+  <div class="wrap reveal">
+    <p class="eyebrow">Abstract</p>
+    <h2>Stereo matching, on both sides of the screen</h2>
+    <p class="lead">
+      Modern stereo matchers fail by <span class="hl">19–62×</span> when disparity becomes negative. Yet stereoscopic
+      content, from cinema&nbsp;3D to VR, lives in exactly that regime. The failure is structural: (1)&nbsp;standard
+      benchmarks always place the zero-disparity plane at infinity, so no training pixel is ever negative; and
+      (2)&nbsp;popular cost-volume architectures assume positive disparity by construction. We address both. First, we
+      release <b>ZDPShift</b>, a calibrated open-movie stereo dataset rendering 4,405&nbsp;frames at five
+      zero-disparity-plane shifts each, with analytical ground-truth disparities. Second, we introduce a
+      <b>signed cost volume</b> that searches negative as well as positive disparities&nbsp;— a parameter-free
+      generalization of the one-sided volume every prior matcher relies on. Fine-tuned on ZDPShift, our matchers are the
+      first to hold <b>sub-pixel accuracy across the full negative-disparity regime</b>.
+    </p>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="wrap reveal">
+    <p class="eyebrow">The blind spot</p>
+    <h2>Every backbone breaks at zero</h2>
+    <p class="lead">On a controlled multi-ZDP benchmark, RAFT-Stereo, IGEV-Stereo and FoundationStereo all degrade by
+      <span class="hl">19–62×</span> the instant the ZDP moves content behind the screen&nbsp;— on the <em>same</em>
+      scene content. Our method (solid line) stays flat across the full range.</p>
+    <figure style="max-width:680px;margin:26px auto 0">
+      <img src="assets/failure_curve.png" alt="EPE vs ZDP shift for SOTA backbones and ours.">
+      <figcaption>End-point error (EPE) vs ZDP shift&nbsp;$\Delta$. Shaded region = negative-disparity regime.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- DATASET -->
+<section id="dataset">
+  <div class="wrap reveal">
+    <p class="eyebrow">The dataset</p>
+    <h2>ZDPShift</h2>
+    <div class="stats">
+      <div class="stat"><div class="n">22,025</div><div class="l">stereo pairs</div></div>
+      <div class="stat"><div class="n">4,405</div><div class="l">frames × 5 ZDP shifts</div></div>
+      <div class="stat"><div class="n">34</div><div class="l">scenes / 7 open movies</div></div>
+      <div class="stat"><div class="n">signed</div><div class="l">analytical GT disparity</div></div>
+    </div>
+    <p class="lead" style="margin-top:26px">Rendered from seven Blender Studio open movies at native 1920×1280 with the
+      Cycles path tracer. Each scene is rendered at five ZDP shifts $\Delta\in\{-16,0,+16,+24,+32\}$&nbsp;px, shifting the
+      principal points while keeping cameras parallel&nbsp;— so the rectified-pair assumption holds and per-pixel signed
+      ground truth follows analytically. A rendering-correctness protocol neutralizes defocus, motion blur, and compositing
+      so every labeled pixel has a valid photometric correspondence.</p>
+    <figure style="margin-top:24px"><img src="assets/gallery.png" alt="ZDPShift scene gallery."><figcaption>Scene gallery: Caminandes, Spring, Sprite Fright, Settlers, Agent 327, Charge, Project Gold.</figcaption></figure>
+  </div>
+</section>
+
+<!-- METHOD -->
+<section id="method">
+  <div class="wrap reveal">
+    <p class="eyebrow">The method</p>
+    <h2>A signed cost volume</h2>
+    <p class="lead">Per-pixel ground truth follows the rectified-pair geometry, with the ZDP set by the shift&nbsp;$\Delta$:</p>
+    <div class="eq">$d(Z,\Delta) \;=\; \dfrac{fB}{Z} \;-\; \Delta$</div>
+    <p class="lead">Cost-volume matchers build correlation over the one-sided range $[0,\,d_\text{max}]$, making negative
+      disparity <em>inexpressible</em>. We extend the index range to $[-d_\text{neg},\,d_\text{pos}]$ and offset the
+      soft-argmax over the signed bins. The reformulation adds <b>no learnable parameters</b>: every layer downstream of
+      the volume is translation-invariant along the disparity axis, so pretrained checkpoints load verbatim.</p>
+    <div class="two">
+      <div class="card"><h3><span class="dot" style="background:var(--pos)"></span>Data recipe</h3>
+        <p>Training samples span all five ZDP shifts, with SceneFlow rehearsal to retain positive-disparity competence.
+          This fixes the training-distribution blind spot for every backbone.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--neg)"></span>Two halves of one problem</h3>
+        <p>The ZDP is an unrecorded, per-scene authoring choice, so it cannot be normalized away by a global shift. Geometry
+          is only half the failure: a matcher trained on non-negative data is biased across zero. Data recipe and signed
+          volume are complementary.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results">
+  <div class="wrap reveal">
+    <p class="eyebrow">Results</p>
+    <h2>Sub-pixel across the full regime</h2>
+    <p class="lead">End-point error (px) at the hardest shift, <b>$\Delta=+32$</b>. Fine-tuning on ZDPShift helps every
+      backbone; the signed cost volume is what unlocks the cost-volume models.</p>
+    <div class="tablewrap" style="margin-top:18px">
+      <table>
+        <thead><tr><th>Model</th><th>Zero-shot</th><th>+ ZDPShift</th><th>+ Signed volume</th></tr></thead>
+        <tbody>
+          <tr><td>RAFT-Stereo</td><td class="drop">47.54</td><td class="best">1.01</td><td>—<sup>†</sup></td></tr>
+          <tr><td>IGEV-Stereo</td><td class="drop">21.61</td><td>4.89</td><td class="best">0.94</td></tr>
+          <tr><td>FoundationStereo</td><td class="drop">58.13</td><td>11.11</td><td class="best">0.81</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--muted);font-size:.84rem;margin-top:8px"><sup>†</sup>RAFT-Stereo uses all-pairs correlation and
+      needs only the data recipe; the signed volume applies to cost-volume backbones.</p>
+    <figure style="margin-top:24px"><img src="assets/progression.png" alt="FoundationStereo error maps across ZDP shifts.">
+      <figcaption>FoundationStereo error across&nbsp;$\Delta$: zero-shot collapses and data-only fine-tuning degrades as disparity crosses zero, while the signed volume stays uniformly low.</figcaption></figure>
+  </div>
+</section>
+
+<!-- VIDEO -->
+<section id="video">
+  <div class="wrap reveal">
+    <p class="eyebrow">Video</p>
+    <h2>See the failure — and the fix</h2>
+    <p class="lead">Panels: <b>left</b> · <b>ground truth</b> (rendered only) · <b>FoundationStereo (zero-shot)</b> ·
+      <b>FoundationStereo + ours</b>. Zero-shot forces everything <span class="pos">positive</span> (red); ours recovers
+      the <span class="neg">behind-screen</span> (blue) regime.</p>
+    <figure>
+      <video src="videos/zdp_compare.mp4" autoplay muted loop playsinline
+             style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
+      <figcaption>Rendered ZDPShift scene at $\Delta{=}{+}32$, <em>with ground truth</em>: zero-shot FoundationStereo
+        collapses in the negative regime while ours tracks GT.</figcaption>
+    </figure>
+    <figure style="margin-top:26px">
+      <video src="videos/jw_compare.mp4" autoplay muted loop playsinline
+             style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
+      <figcaption>Real 3D movie (<em>Jurassic World</em>): zero-shot forces the receding scene positive; ours recovers
+        the behind-screen depth. Verified against sign-agnostic optical flow.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- IN THE WILD -->
+<section id="wild">
+  <div class="wrap reveal">
+    <p class="eyebrow">In the wild</p>
+    <h2>Real 3D movies live behind the screen</h2>
+    <p class="lead">On frames from released stereoscopic films&nbsp;— live action and animation&nbsp;— most pixels already
+      sit <span class="neg">behind the screen</span>. Zero-shot FoundationStereo cannot represent it and forces everything
+      <span class="pos">positive</span>; our signed matcher recovers it, matching sign-agnostic optical flow to ≈1&nbsp;px.
+      <b>Drag the handle</b> to compare.</p>
+
+    <div class="slider" id="cmp">
+      <img src="assets/slider_zeroshot.png" alt="zero-shot disparity">
+      <div class="after"><img src="assets/slider_ours.png" alt="ours disparity"></div>
+      <div class="tag l">Zero-shot FS</div>
+      <div class="tag r">+ Ours (signed)</div>
+      <div class="handle"></div>
+    </div>
+    <figcaption style="text-align:center;color:var(--muted);font-size:.9rem;margin-top:12px">
+      <em>Jurassic World</em> (3D). <span class="pos">Red</span> = in front of screen, <span class="neg">blue</span> = behind.
+      Zero-shot reports 0% behind-screen; ours recovers 90%.</figcaption>
+
+    <figure style="margin-top:30px"><img src="assets/real3d.png" alt="Signed disparity on Jurassic World and Finding Dory.">
+      <figcaption>Two commercial 3D films (Jurassic World, live action; Finding Dory, animation). Zero-shot forces the receding scene positive; ours recovers the behind-screen regime, verified against optical flow.</figcaption></figure>
+  </div>
+</section>
+
+<!-- BIBTEX -->
+<section id="bibtex">
+  <div class="wrap reveal">
+    <p class="eyebrow">Citation</p>
+    <h2>BibTeX</h2>
+    <pre><button class="copy" onclick="navigator.clipboard.writeText(document.getElementById('bib').innerText)">Copy</button><code id="bib">@inproceedings{zdpshift2027,
+  title     = {ZDPShift: Beyond the Zero-Disparity Plane in Stereo},
+  author    = {Anonymous Authors},
+  booktitle = {Under review at the International Conference
+               on Learning Representations (ICLR)},
+  year      = {2027}
+}</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="note">Template page&nbsp;— fill in the author list, paper / arXiv / code / dataset links, and BibTeX before publishing (marked <code>#</code> / <code>TODO</code> in <code>index.html</code>).</p>
+    <p style="margin-top:18px">Figures © the authors. Source content rendered from Blender Studio open movies (CC-BY). Film frames shown for research illustration.</p>
+  </div>
+</footer>
+
+<script>
+  // reveal-on-scroll
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // before/after slider
+  (function(){
+    const s=document.getElementById('cmp'); if(!s) return;
+    const after=s.querySelector('.after'), handle=s.querySelector('.handle');
+    const base=s.querySelector('img');
+    function setW(px){
+      const r=s.getBoundingClientRect();
+      let p=Math.max(0,Math.min(1,px/r.width));
+      after.style.width=(p*100)+'%';
+      after.querySelector('img').style.width=r.width+'px';
+      handle.style.left=(p*100)+'%';
+    }
+    function fromEvent(e){const r=s.getBoundingClientRect();const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;setW(x);}
+    let drag=false;
+    s.addEventListener('mousedown',e=>{drag=true;fromEvent(e);});
+    window.addEventListener('mousemove',e=>{if(drag)fromEvent(e);});
+    window.addEventListener('mouseup',()=>drag=false);
+    s.addEventListener('touchstart',e=>{drag=true;fromEvent(e);},{passive:true});
+    s.addEventListener('touchmove',e=>{if(drag)fromEvent(e);},{passive:true});
+    s.addEventListener('touchend',()=>drag=false);
+    base.addEventListener('load',()=>setW(s.getBoundingClientRect().width/2));
+    window.addEventListener('resize',()=>setW(s.getBoundingClientRect().width*(parseFloat(handle.style.left||'50')/100)));
+    setTimeout(()=>setW(s.getBoundingClientRect().width/2),200);
+  })();
+</script>
+</body>
+</html>
