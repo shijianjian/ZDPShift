@@ -4,7 +4,7 @@
 
 **Signed stereo matching for content on both sides of the screen.**
 
-[Paper](#) · [arXiv](#) · [Project page](#) · [Dataset](#) · [Weights (HF)](#)
+<!-- [Paper](#) · [arXiv](#) · [Project page](#) · [Dataset](#) · [Weights (HF)](#) -->
 
 <img src="assets/teaser.png" width="90%">
 
@@ -16,6 +16,10 @@ repository provides **fine-tuning and evaluation** for RAFT-Stereo, IGEV-Stereo,
 and FoundationStereo on the ZDPShift dataset, including a **signed cost volume**:
 a parameter-free generalization of the one-sided cost volume that lets cost-volume
 matchers express negative disparity. Pretrained checkpoints load verbatim.
+
+<div align="center">
+<img src="assets/performance.png" width="80%">
+</div>
 
 ## Install
 
@@ -58,7 +62,7 @@ Fine-tuned ZDPShift checkpoints go in `weights/` (hosted on Hugging Face; see
 
 ## Dataset
 
-Download ZDPShift and point `--dataset` / `--train-root` at the split. A tiny
+Download [ZDPShift](https://huggingface.co/datasets/shijianjian/ZDPShift) dataset and point `--dataset` / `--train-root` at the split. A tiny
 sample (one scene across all five ZDP shifts) ships under `dataset/eval/` for a
 smoke test. Layout:
 
@@ -112,17 +116,6 @@ train_*.py  fine-tuning entry points
 eval_*.py   evaluation (+ evaluate.py helper)
 weights/    fine-tuned checkpoints (Hugging Face)
 dataset/    sample eval frames
-```
-
-## Citation
-
-```bibtex
-@inproceedings{zdpshift2027,
-  title     = {ZDPShift: Beyond the Zero-Disparity Plane in Stereo},
-  author    = {Anonymous Authors},
-  booktitle = {Under review at ICLR},
-  year      = {2027}
-}
 ```
 
 ## License

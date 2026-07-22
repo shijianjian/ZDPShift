@@ -61,7 +61,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", required=True)
     ap.add_argument("--ckpt", required=True)
-    ap.add_argument("--cfg", default=str(FS_DIR / "pretrained_models/11-33-40/cfg.yaml"))
+    ap.add_argument("--cfg", default=str(ROOT / "configs/foundationstereo.yaml"))
     ap.add_argument("--out", required=True)
     ap.add_argument("--iters", type=int, default=32)
     ap.add_argument("--signed-volume", action="store_true")

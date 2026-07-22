@@ -2,6 +2,8 @@ __pycache__/
 *.pyc
 weights/*.pth
 weights/*.tar
-out_*/ eval_*/ results*/
+out_*/
+eval_*/
+results*/
 .DS_Store
 env.sh
