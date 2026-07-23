@@ -5,10 +5,64 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZDPShift · Beyond the Zero-Disparity Plane in Stereo</title>
 <meta name="description" content="ZDPShift: a calibrated open-movie stereo dataset and a signed cost volume for stereo matching beyond the zero-disparity plane (negative disparity).">
+<meta name="keywords" content="stereo matching, negative disparity, signed disparity, zero-disparity plane, cost volume, signed cost volume, FoundationStereo, IGEV-Stereo, RAFT-Stereo, stereo dataset, 3D cinema, stereoscopic, VR, depth estimation, disparity estimation, ZDPShift">
+<meta name="author" content="Jian Shi">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0b1020">
+<link rel="canonical" href="https://shijianjian.github.io/ZDPShift/">
+
+<!-- Open Graph -->
 <meta property="og:title" content="ZDPShift: Beyond the Zero-Disparity Plane in Stereo">
 <meta property="og:description" content="Modern stereo matchers fail by 19–62× when disparity becomes negative. ZDPShift fixes it with a calibrated multi-ZDP dataset and a signed cost volume.">
-<meta property="og:image" content="assets/teaser.png">
+<meta property="og:image" content="https://shijianjian.github.io/ZDPShift/assets/teaser.png">
+<meta property="og:image:width" content="1850">
+<meta property="og:image:height" content="1297">
+<meta property="og:image:alt" content="FoundationStereo across five zero-disparity-plane shifts: zero-shot collapses in the negative regime, ZDPShift stays sub-pixel.">
+<meta property="og:url" content="https://shijianjian.github.io/ZDPShift/">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="ZDPShift">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ZDPShift: Beyond the Zero-Disparity Plane in Stereo">
+<meta name="twitter:description" content="Modern stereo matchers fail by 19–62× when disparity becomes negative. ZDPShift fixes it with a calibrated multi-ZDP dataset and a signed cost volume.">
+<meta name="twitter:image" content="https://shijianjian.github.io/ZDPShift/assets/teaser.png">
+<meta name="twitter:image:alt" content="FoundationStereo across five zero-disparity-plane shifts: zero-shot vs ZDPShift.">
+
+<!-- Structured data: dataset + software (Google Dataset Search / rich results) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Dataset",
+      "name": "ZDPShift",
+      "alternateName": "ZDPShift stereo dataset",
+      "description": "A calibrated open-movie stereo dataset with analytical signed ground-truth disparity: 4,405 frames rendered at five zero-disparity-plane shifts each (22,025 stereo pairs) across 34 scenes from 7 Blender Studio open movies, spanning both positive (in front of screen) and negative (behind screen) disparity.",
+      "url": "https://shijianjian.github.io/ZDPShift/",
+      "sameAs": "https://huggingface.co/datasets/shijianjian/ZDPShift",
+      "keywords": ["stereo matching", "negative disparity", "signed disparity", "zero-disparity plane", "cost volume", "depth estimation", "stereoscopic 3D", "VR"],
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "creator": {"@type": "Person", "name": "Jian Shi"},
+      "distribution": [{
+        "@type": "DataDownload",
+        "encodingFormat": "application/zip",
+        "contentUrl": "https://huggingface.co/datasets/shijianjian/ZDPShift"
+      }],
+      "variableMeasured": "signed disparity (px)"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "ZDPShift",
+      "description": "Fine-tuning and evaluation code for RAFT-Stereo, IGEV-Stereo, and FoundationStereo on the ZDPShift dataset, including a parameter-free signed cost volume that lets cost-volume matchers express negative disparity.",
+      "codeRepository": "https://github.com/shijianjian/ZDPShift",
+      "programmingLanguage": "Python",
+      "license": "https://opensource.org/licenses/MIT",
+      "author": {"@type": "Person", "name": "Jian Shi"}
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -186,18 +240,18 @@
       <figcaption><b>Unseen dataset</b> (with GT): <b>Enables</b> negative disparities. <b>Preserves</b> performances on positive-only datasets.</figcaption>
       <video src="videos/zdp_compare.mp4" poster="assets/_poster_zdp.png" autoplay muted loop playsinline
              style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
-      <video src="videos/pos_spring.mp4" autoplay muted loop playsinline
+      <video src="videos/pos_spring.mp4" poster="assets/_poster_spring.png" autoplay muted loop playsinline
              style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
     </figure>
     <figure style="margin-top:22px">
-      <figcaption><b>In the wild</b>: a real 3D movie (no ground truth).</figcaption>
+      <figcaption><b>In the wild</b>: Making stereo matching on real-world 3D movies possible.</figcaption>
       <video src="videos/jw_compare.mp4" poster="assets/_poster_jw.png" autoplay muted loop playsinline
              style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
-      <video src="videos/neg_avatar2_wow.mp4" autoplay muted loop playsinline
+      <video src="videos/neg_avatar2_wow.mp4" poster="assets/_poster_avatar2.png" autoplay muted loop playsinline
              style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
-      <video src="videos/neg_galapagos.mp4" autoplay muted loop playsinline
+      <video src="videos/neg_galapagos.mp4" poster="assets/_poster_galapagos.png" autoplay muted loop playsinline
              style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
-      <video src="videos/neg_jurassic_world_a.mp4" autoplay muted loop playsinline
+      <video src="videos/neg_jurassic_world_a.mp4" poster="assets/_poster_jw_a.png" autoplay muted loop playsinline
              style="width:100%;border-radius:16px;border:1px solid var(--line);display:block"></video>
     </figure>
   </div>
